@@ -8,15 +8,15 @@ async def get_user_by_id(user_id: int):
         result = await session.execute(select(User).where(User.id == user_id))
         return result.scalars().first()
 
-async def add_or_update_user(user_id: int, username: str, full_name: str, phone_number: str = None):
+async def add_or_update_user(user_id: int, username: str = None, full_name: str = None, phone_number: str = None):
     async with async_session_maker() as session:
         user = await get_user_by_id(user_id)
         if not user:
             user = User(id=user_id, username=username, full_name=full_name, phone_number=phone_number)
             session.add(user)
         else:
-            user.username = username
-            user.full_name = full_name
+            if full_name:
+                user.full_name = full_name
             if phone_number:
                 user.phone_number = phone_number
         await session.commit()

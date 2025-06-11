@@ -25,6 +25,5 @@ class ChatSupportState(StatesGroup):
     chat = State()
 
 class SettingsState(StatesGroup):
-    choose = State()
     set_name = State()
     set_phone = State()
