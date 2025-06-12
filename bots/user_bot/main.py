@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from core.config import BOT_TOKEN_USER
-from bots.user_bot.handlers import complaints, register, suggestion, contact, settings, application_choise
+from bots.user_bot.handlers import call_application, complaints, register, suggestion, settings, application_choise, usefull_contacts
 from bots.user_bot.middlewares import BlockCheckMiddleware
 
 
@@ -16,21 +16,10 @@ async def main():
     dp.include_router(register.router)
     dp.include_router(complaints.router)
     dp.include_router(suggestion.router)
-    dp.include_router(contact.router)
+    dp.include_router(call_application.router)
     dp.include_router(settings.router)
     dp.include_router(application_choise.router)
-
-    from aiogram import Router, F
-    from aiogram.types import Message, CallbackQuery, FSInputFile
-    from aiogram.fsm.context import FSMContext
-    
-    # @dp.message(F.photo | F.video)
-    # async def get_media(message: Message, state: FSMContext):
-    #     data = await state.get_data()
-    #     await state.update_data(media=message.photo[-1].file_id if message.photo else (message.video.file_id if message.video else None))
-    #     await message.answer("Опишите суть проблемы:")
-
-
+    dp.include_router(usefull_contacts.router)
 
     await dp.start_polling(bot)
 

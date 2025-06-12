@@ -20,6 +20,16 @@ def make_complaint_text(data: dict) -> str:
             # f"🆔 reply_to_user_id:{user.id}"
         )
 
+def make_callback_application(data: dict) -> str:
+    user = data.get("user")
+    return (
+            f"<b>📞 Пользователь просит перезвонить:</b>\n"
+            f"@{user.username or '—'}\n"
+            f"<b>Имя и Фамилия:</b> {user.full_name or '—'}\n"
+            f"<b>Номер телефона:</b> {user.phone_number}\n"
+            # f"🆔 reply_to_user_id:{user.id}"
+        )
+
 
 async def get_all_user_ids():
     async with async_session_maker() as session:

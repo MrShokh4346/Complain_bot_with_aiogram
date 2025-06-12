@@ -49,8 +49,8 @@ async def save_phone(message: Message, state: FSMContext):
     if not message.text.startswith("+7") or len(message.text) != 12 or not message.text[2:].isdigit():
         await message.answer("❗ Пожалуйста, введите корректный номер телефона в формате +7XXXXXXXXXX.")
         return
-    await add_or_update_user(user_id, phone_number=message.text)
-    await message.answer("🛠✅🛠 Настройки номера успешно применены", reply_markup=main_menu_keyboard())
+    user = await add_or_update_user(user_id, phone_number=message.text)
+    await message.answer(f"🛠✅🛠 Настройки номера успешно применены", reply_markup=main_menu_keyboard())
     await state.clear()
 
 

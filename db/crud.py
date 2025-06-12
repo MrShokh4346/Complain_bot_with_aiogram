@@ -1,3 +1,4 @@
+import datetime
 from db.base import async_session_maker
 from sqlalchemy import or_, select
 from db.models import User
@@ -10,7 +11,8 @@ async def get_user_by_id(user_id: int):
 
 async def add_or_update_user(user_id: int, username: str = None, full_name: str = None, phone_number: str = None):
     async with async_session_maker() as session:
-        user = await get_user_by_id(user_id)
+        result = await session.execute(select(User).where(User.id == user_id))
+        user = result.scalars().first()
         if not user:
             user = User(id=user_id, username=username, full_name=full_name, phone_number=phone_number)
             session.add(user)
@@ -19,6 +21,7 @@ async def add_or_update_user(user_id: int, username: str = None, full_name: str 
                 user.full_name = full_name
             if phone_number:
                 user.phone_number = phone_number
+            user.updated_at = datetime.datetime.now()
         await session.commit()
         return user
 

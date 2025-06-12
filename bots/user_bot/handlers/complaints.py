@@ -69,7 +69,7 @@ async def handle_complaint_body_skip(callback: CallbackQuery, state: FSMContext)
     else:
         await callback.message.bot.send_message(COMPLAINT_GROUP_ID, complaint_text, parse_mode="HTML")
 
-    await callback.message.answer(Texts.get_complaint_sent_text(), reply_markup=main_menu_keyboard())
+    await callback.message.answer(Texts.get_complaint_sent_text(), reply_markup=main_menu_keyboard(), parse_mode="HTML")
     await state.clear()
 
 
@@ -116,6 +116,6 @@ async def get_body(message: Message, state: FSMContext):
     else:
         await message.bot.send_message(COMPLAINT_GROUP_ID, complaint_text, parse_mode="HTML")
 
-    await message.answer(Texts.get_complaint_sent_text(), reply_markup=main_menu_keyboard())
+    await message.answer(Texts.get_complaint_sent_text(), reply_markup=main_menu_keyboard(), parse_mode="HTML")
     await state.clear()
 
