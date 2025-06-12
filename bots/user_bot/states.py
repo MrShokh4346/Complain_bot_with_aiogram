@@ -27,3 +27,11 @@ class ChatSupportState(StatesGroup):
 class SettingsState(StatesGroup):
     set_name = State()
     set_phone = State()
+
+class BroadcastState(StatesGroup):
+    waiting_for_content = State()
+
+
+class AnswerToQuestionState(StatesGroup):
+    waiting_for_answer = State()
+    question_id = State()  # To store the ID of the question being answered

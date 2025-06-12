@@ -1,8 +1,9 @@
 from aiogram import BaseMiddleware
 from aiogram.types import Message, TelegramObject
-from db.crud import get_user_by_telegram_id_or_username
+from db.crud.user_crud import get_user_by_telegram_id_or_username
 from aiogram.fsm.context import FSMContext
 from bots.user_bot.states import RegistrationState
+from typing import Callable, Awaitable, Dict
 
 class BlockCheckMiddleware(BaseMiddleware):
     async def __call__(self, handler, event: TelegramObject, data: dict):
@@ -23,3 +24,15 @@ class BlockCheckMiddleware(BaseMiddleware):
                 return
 
         return await handler(event, data)
+    
+
+ADMINS = {123456789}  # replace with real admin Telegram IDs
+
+class AdminCheckMiddleware(BaseMiddleware):
+    async def __call__(self, handler: Callable, event: Message, data: Dict):
+        if event.from_user.id not in ADMINS:
+            await event.answer("У вас нет доступа к админ-панели.")
+            return
+        return await handler(event, data)
+
+
