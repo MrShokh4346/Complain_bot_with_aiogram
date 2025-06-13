@@ -560,3 +560,4 @@ venv
 test_bot.py
 __pycache__
 /__pycache__
+*.sqlite3
