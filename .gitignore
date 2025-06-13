@@ -554,4 +554,9 @@ Temporary Items
 !.github
 
 .env
+/.env
 venv
+/venv
+test_bot.py
+__pycache__
+/__pycache__

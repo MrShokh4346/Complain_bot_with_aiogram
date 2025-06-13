@@ -10,7 +10,7 @@ from db.crud.questions_crud import get_all_questions, save_answer_to_question
 router = Router()
 
 
-@router.message(F.text.lower().contains("/questions"))
+@router.message(F.text.lower().contains("/questions") & F.chat.id == ADMIN_GROUP_ID)
 async def list_questions(message: Message):
     parts = message.text.strip().split()
     if len(parts) < 2 or not parts[1].isdigit():
