@@ -1,5 +1,7 @@
 from aiogram import BaseMiddleware
 from aiogram.types import Message, TelegramObject
+from bots.common.texts import Texts
+from core.config import ADMIN_GROUP_ID
 from db.crud.user_crud import get_user_by_telegram_id_or_username
 from aiogram.fsm.context import FSMContext
 from bots.user_bot.states import RegistrationState
@@ -15,8 +17,7 @@ class BlockCheckMiddleware(BaseMiddleware):
             if not user:
                 state: FSMContext = data['state']
                 await state.set_state(RegistrationState.full_name)
-                await event.answer("👋 Доброго времени суток, бот создан, чтобы обрабатывать заявки и обращения пользователей. Чтобы воспользоваться этим, пришлите для начала Ваше Имя и Фамилию")
-                return  # Stop further processing
+                return await handler(event, data)
 
             # If user is found but blocked — stop interaction
             if user.is_blocked:
@@ -30,7 +31,7 @@ ADMINS = {123456789}  # replace with real admin Telegram IDs
 
 class AdminCheckMiddleware(BaseMiddleware):
     async def __call__(self, handler: Callable, event: Message, data: Dict):
-        if event.from_user.id not in ADMINS:
+        if event.chat.id != ADMIN_GROUP_ID:
             await event.answer("У вас нет доступа к админ-панели.")
             return
         return await handler(event, data)

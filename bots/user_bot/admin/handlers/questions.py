@@ -10,9 +10,18 @@ from db.crud.questions_crud import get_all_questions, save_answer_to_question
 router = Router()
 
 
-@router.message(F.text == "/questions")
+@router.message(F.text.lower().contains("/questions"))
 async def list_questions(message: Message):
-    questions = await get_all_questions()
+    parts = message.text.strip().split()
+    if len(parts) < 2 or not parts[1].isdigit():
+        quantity = 10  # Default quantity if not specified
+    else:
+        try:
+            quantity = int(parts[1])
+        except ValueError:
+            await message.answer("❗ Укажите корректное количество вопросов для отображения: <code>/questions [количество]</code>", parse_mode="HTML")
+            return
+    questions = await get_all_questions(quantity)
     if len(questions) == 0:
         await message.answer("❗ Нет вопросов для ответа.")
         return
@@ -27,7 +36,7 @@ async def confirm_call(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await state.set_state(AnswerToQuestionState.waiting_for_answer)
     await state.update_data(question_id=int(callback.data.split("_")[1]))
-    await callback.message.answer("✏️ Пожалуйста, введите ваш ответ на вопрос.\n❗ Укажите ID вапроса: `/questionid_<question_id> ...`")
+    await callback.message.answer("✏️ Пожалуйста, введите ваш ответ на вопрос.\n❗ Укажите ID вапроса: <code>/questionid_</code>[question_id] ваш ответ", parse_mode="HTML")
 
 
 @router.message(AnswerToQuestionState.waiting_for_answer, F.text.lower().contains("/questionid"))
@@ -35,12 +44,12 @@ async def answer_question(message: Message, state: FSMContext):
 
     part = message.text.strip().split()[0]
     if not part.startswith("/questionid"):
-        await message.answer("❗ Укажите ID вопроса: `/questionid_<question_id> ...`")
+        await message.answer("❗ Укажите ID вопроса: <code>/questionid_</code>[question_id] ваш ответ", parse_mode="HTML")
         return
     
     parts = part.split("_")
     if len(parts) < 2 or not parts[1].isdigit():
-        await message.answer("❗ Укажите корректный ID вопроса: `/questionid_<question_id> ...`")
+        await message.answer("❗ Укажите корректный ID вопроса: <code>/questionid_</code>[question_id] ваш ответ", parse_mode="HTML")
         return
     
     entered_question_id = int(parts[1])
@@ -50,14 +59,17 @@ async def answer_question(message: Message, state: FSMContext):
     if state_question_id != entered_question_id:
         return
     
-    question = await save_answer_to_question(state_question_id, message.text)
+    answer_text = message.text[len(part):].strip()
+    
+    question = await save_answer_to_question(state_question_id, answer_text)
     
     await message.answer("Ваш ответ успешно отправлен!")
     
     # Optionally, you can notify the user who asked the question
     await message.bot.send_message(
         question.user_id,
-        f"Ваш вопрос:\n{question.question_text}\n\nОтвет администратора:\n{message.text}"
+        f"❓ <b>Ваш вопрос:</b>\n{question.question_text}\n\n✅ <b>Ответ администратора:</b>\n{answer_text}",
+        parse_mode="HTML"
     )
     await state.clear()
 

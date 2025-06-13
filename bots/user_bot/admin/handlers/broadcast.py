@@ -1,8 +1,7 @@
-import select
+from sqlalchemy import select
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
-from bots.admin_bot.states import BroadcastState
 from core.config import ADMIN_GROUP_ID
 from db.crud.user_crud import get_all_users
 from db.models import User

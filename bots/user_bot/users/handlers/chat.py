@@ -6,11 +6,10 @@ from bots.user_bot.users.keyboards.call_application import answer_question_direc
 from bots.user_bot.users.keyboards.main_menu import main_menu_keyboard
 from bots.user_bot.states import  ChatSupportState
 from core.config import ADMIN_GROUP_ID, COMPLAINT_GROUP_ID
-from core.utils import save_question
+from db.crud.questions_crud import save_question
 from db.crud.user_crud import get_user_by_id
 
 router = Router()
-
 
 # ----- CHAT WITH DISPATCHER -----
 @router.callback_query(F.data == "contact_chat")
@@ -28,7 +27,7 @@ async def relay_to_admin(message: Message):
     if not user:
         await message.answer("Пользователь не найден. Пожалуйста, попробуйте позже.")
         return
-    await message.bot.send_message(COMPLAINT_GROUP_ID, question_text, reply_markup=answer_question_directly_navigation_buttons(question_id))
+    await message.bot.send_message(COMPLAINT_GROUP_ID, question_text, reply_markup=answer_question_directly_navigation_buttons(question_id), parse_mode="HTML")
 
 
 @router.callback_query(F.data == "end_chat")

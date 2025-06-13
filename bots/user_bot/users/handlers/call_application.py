@@ -12,7 +12,8 @@ from db.crud.user_crud import get_user_by_id
 router = Router()
 
 @router.message(F.text.lower().contains("связаться"))
-async def contact_start(message: Message):
+async def contact_start(message: Message, state: FSMContext):
+    await state.clear()
     await message.answer("👇 Выберите способ связи из нижеперечисленного списка:", reply_markup=call_application_navigation_buttons())
 
 # ----- CALL REQUEST -----

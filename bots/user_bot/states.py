@@ -8,6 +8,7 @@ class RegistrationState(StatesGroup):
 class ComplaintState(StatesGroup):
     address = State()
     media = State()
+    media_type = State()  # State to handle media type selection
     body = State()
     address_skipped= State()  # State to handle skips in the complaint process
     media_skipped= State()  # State to handle skips in the complaint process

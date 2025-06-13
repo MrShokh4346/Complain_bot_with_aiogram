@@ -14,6 +14,7 @@ router = Router()
 
 @router.message(F.text.lower().contains("настройки"))
 async def settings_menu(message: Message, state: FSMContext):
+    await state.clear()
     await message.answer(Texts.get_settings_text(), reply_markup=settings_navigation_buttons())
 
 

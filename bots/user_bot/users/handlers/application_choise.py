@@ -26,5 +26,6 @@ async def back_to_main_menu(callback: CallbackQuery, state: FSMContext):
 
 @router.message(F.text == "📛 Оставить заявку")
 async def show_request_submenu(message: Message, state: FSMContext):
+    await state.clear()
     await message.answer(Texts.get_application_choosing_text(), reply_markup=application_choosing_navigation_buttons())
 

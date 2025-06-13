@@ -1,3 +1,4 @@
+from db.crud.user_crud import get_user_by_telegram_id_or_username
 from db.models import Question, User
 from sqlalchemy import select, or_
 from db.base import async_session_maker
@@ -48,35 +49,3 @@ def make_callback_application(data: dict) -> str:
             f"<b>Номер телефона:</b> {user.phone_number}\n"
             # f"🆔 reply_to_user_id:{user.id}"
         )
-
-
-async def get_all_user_ids():
-    async with async_session_maker() as session:
-        result = await session.execute(select(User.telegram_id))
-        return [row[0] for row in result.all()]
-
-
-async def get_user_by_telegram_id_or_username(query: str):
-    async with async_session_maker() as session:
-        stmt = select(User).where(
-            or_(
-                User.id == int(query) if query.isdigit() else False,
-                User.username == query
-            )
-        )
-        result = await session.execute(stmt)
-        return result.scalars().first()
-    
-
-async def save_question(text: str, user_id: int):
-    async with async_session_maker() as session:
-        result = await session.execute(select(User).where(User.id == user_id))
-        user = result.scalars().first()
-        if not user:
-            return None
-        question = Question(user_id=user.id, question_text = text, user=user)
-        session.add(question)
-        await session.commit()
-        return f"💬 Новое сообщение от @{user.username or '—'} ({user.full_name}):\n<b>Question ID:</b> {question.id} \n{text}", question.id
-    
-

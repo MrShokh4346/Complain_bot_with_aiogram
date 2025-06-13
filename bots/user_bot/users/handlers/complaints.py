@@ -76,8 +76,8 @@ async def handle_complaint_body_skip(callback: CallbackQuery, state: FSMContext)
 @router.callback_query(ComplaintState.body, F.data == "complaint_back")
 async def handle_complaint_body_back(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
-    await state.set_state(ComplaintState.address)
-    await callback.message.edit_text(Texts.get_complaint_address_text(), reply_markup=complaint_navigation_buttons(), parse_mode="HTML")
+    await state.set_state(ComplaintState.media)
+    await callback.message.edit_text(Texts.get_complaint_media_text(), reply_markup=complaint_navigation_buttons(), parse_mode="HTML")
 
 
 @router.message(ComplaintState.address)
@@ -91,6 +91,7 @@ async def get_address(message: Message, state: FSMContext):
 async def get_media(message: Message, state: FSMContext):
     data = await state.get_data()
     await state.update_data(media=message.photo[-1].file_id if message.photo else (message.video.file_id if message.video else None))
+    await state.update_data(media_type="photo" if message.photo else ("video" if message.video else None))
     await state.set_state(ComplaintState.body)
     await message.answer(Texts.get_complaint_body_text(), reply_markup=complaint_navigation_buttons(), parse_mode="HTML")
 
@@ -112,7 +113,10 @@ async def get_body(message: Message, state: FSMContext):
     complaint_text = make_complaint_text(data)
 
     if data.get('media'):
-        await message.bot.send_photo(COMPLAINT_GROUP_ID, photo=data['media'], caption=complaint_text, parse_mode="HTML")
+        if data.get('media_type') == "video":
+            await message.bot.send_video(COMPLAINT_GROUP_ID, video=data['media'], caption=complaint_text, parse_mode="HTML")
+        else:  # default to photo
+            await message.bot.send_photo(chat_id=COMPLAINT_GROUP_ID, photo=data['media'], caption=complaint_text, parse_mode="HTML")
     else:
         await message.bot.send_message(COMPLAINT_GROUP_ID, complaint_text, parse_mode="HTML")
 
