@@ -1,0 +1,1 @@
+worker: python -m bots.user_bot.main

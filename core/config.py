@@ -10,4 +10,5 @@ ADMIN_GROUP_ID = int(os.getenv("ADMIN_GROUP_ID"))
 COMPLAINT_GROUP_ID = int(os.getenv("COMPLAINT_GROUP_ID"))
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///db.sqlite3")
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost")
 

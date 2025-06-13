@@ -2,16 +2,25 @@ import asyncio
 from aiogram.filters import Command
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from core.config import BOT_TOKEN_USER
+from core.config import BOT_TOKEN_USER, REDIS_URL
 from bots.user_bot.users.handlers import call_application, complaints, register, suggestion, settings, application_choise, usefull_contacts, chat
-from bots.user_bot.middlewares import BlockCheckMiddleware, AdminCheckMiddleware
-
+from bots.user_bot.middlewares import BlockCheckMiddleware
+from aiogram.fsm.storage.redis import RedisStorage
 from bots.user_bot.admin.handlers import broadcast, user_management, questions
+import redis.asyncio as redis
 
 
 async def main():
     bot = Bot(token=BOT_TOKEN_USER)
-    dp = Dispatcher(storage=MemoryStorage())
+    storage = RedisStorage.from_url(REDIS_URL)
+
+    # # Create Redis connection
+    # redis_client = redis.Redis(host="localhost", port=6379)
+
+    # # Use RedisStorage for FSM
+    # storage = RedisStorage(redis=redis_client)
+
+    dp = Dispatcher(storage=storage)
     
     dp.include_router(register.router)
 
@@ -27,12 +36,6 @@ async def main():
     dp.include_router(application_choise.router)
     dp.include_router(complaints.router)
 
-    # # admin middleware
-    # broadcast.router.message.middleware(AdminCheckMiddleware())
-    # commands.router.message.middleware(AdminCheckMiddleware())
-    # user_management.router.message.middleware(AdminCheckMiddleware())
-    # questions.router.message.middleware(AdminCheckMiddleware())
-    
     # admin routers
     dp.include_router(broadcast.router)
     dp.include_router(user_management.router)
