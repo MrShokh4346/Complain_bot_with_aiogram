@@ -16,7 +16,10 @@ router = Router()
 async def user_info(message: Message):
     parts = message.text.strip().split()
     if len(parts) < 2:
-        await message.answer("❗ Укажите ID или username пользователя: `/userinfo `<user_id> или  `/userinfo `<username>", parse_mode="Markdown")
+        await message.answer(
+            "❗ Укажите ID или username пользователя: `/userinfo` `<user_id>` или  `/userinfo` `<username>`",
+            parse_mode="MarkdownV2"
+        )
         return
     info = await make_user_info_text(parts)
     await message.answer(info)
@@ -30,7 +33,10 @@ async def user_info(message: Message):
 async def block_user_function(message: Message):
     parts = message.text.split()
     if len(parts) < 2:
-        return await message.answer("❗ Укажите ID или username пользователя: `/block `<user_id> или  `/block `<username>", parse_mode="Markdown")
+        return await message.answer(
+            "❗ Укажите ID или username пользователя: `/block` `<user_id>` или  `/userinfo` `<username>`",
+            parse_mode="MarkdownV2"
+        )
 
     query = parts[1]
     result = await block_user(query)
@@ -48,7 +54,10 @@ async def block_user_function(message: Message):
 async def unblock_user_function(message: Message):
     parts = message.text.split()
     if len(parts) < 2:
-        return await message.answer("❗ Укажите ID или username пользователя: `/unblock `<user_id> или  `/unblock `<username>", parse_mode="Markdown")
+        return await message.answer(
+            "❗ Укажите ID или username пользователя: `/unblock` `<user_id>` или  `/userinfo` `<username>`",
+            parse_mode="MarkdownV2"
+        )
 
     query = parts[1]
     result = await unblock_user(query)
