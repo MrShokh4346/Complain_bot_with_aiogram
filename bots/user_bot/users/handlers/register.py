@@ -42,6 +42,7 @@ async def get_phone_number(message: Message, state: FSMContext):
     # Validate the phone number input
     if not message.text.startswith("+7") or len(message.text) != 12 or not message.text[2:].isdigit():
         await message.answer("❗ Пожалуйста, введите корректный номер телефона в формате +7XXXXXXXXXX.")
+        await state.set_state(RegistrationState.phone_number)
         return
     await state.update_data(phone_number=message.text)
     user_data = await state.get_data()
