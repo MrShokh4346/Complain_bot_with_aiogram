@@ -65,7 +65,10 @@ async def handle_complaint_body_skip(callback: CallbackQuery, state: FSMContext)
     complaint_text = make_complaint_text(data)
 
     if data.get('media'):
-        await callback.message.bot.send_photo(COMPLAINT_GROUP_ID, photo=data['media'], caption=complaint_text, parse_mode="HTML")
+        if data.get('media_type') == "video":
+            await callback.message.bot.send_video(COMPLAINT_GROUP_ID, video=data['media'], caption=complaint_text, parse_mode="HTML")
+        else:  # default to photo
+            await callback.message.bot.send_photo(chat_id=COMPLAINT_GROUP_ID, photo=data['media'], caption=complaint_text, parse_mode="HTML")
     else:
         await callback.message.bot.send_message(COMPLAINT_GROUP_ID, complaint_text, parse_mode="HTML")
 

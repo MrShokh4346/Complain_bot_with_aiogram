@@ -14,7 +14,7 @@ def complaint_navigation_buttons():
 def application_choosing_navigation_buttons():
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="📛 Оставить заявку", callback_data="fill_form"), InlineKeyboardButton(text="💡 Поделиться\n предложением", callback_data="suggest_solution")],
+            [InlineKeyboardButton(text="📛 Оставить заявку", callback_data="fill_form"), InlineKeyboardButton(text="💡 Поделиться предложением", callback_data="suggestion")],
             [InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_main_menu")]
         ],
         resize_keyboard=True
