@@ -40,3 +40,8 @@ async def confirm_call(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("Отлично! Наш диспетчер перезвонит Вам в ближайшее время.")
     await state.clear()
 
+
+@router.callback_query(F.data == "call_application_back")
+async def change_call_number(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await callback.message.answer(Texts.get_main_menu_text(), reply_markup=main_menu_keyboard())

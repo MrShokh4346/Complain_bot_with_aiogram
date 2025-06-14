@@ -12,7 +12,7 @@ router = Router()
 async def broadcast_command(message: Message):
     parts = message.text.strip().split()
     if len(parts) < 2:
-        await message.answer("❗ Использование: `/broadcast ваш текст`", parse_mode="Markdown")
+        await message.answer("❗ Использование: `/broadcast `ваш текст", parse_mode="Markdown")
         return
     content = message.text[len("/broadcast "):]
     async with async_session_maker() as session:

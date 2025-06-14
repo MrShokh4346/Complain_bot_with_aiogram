@@ -3,6 +3,7 @@ from aiogram.fsm.state import State, StatesGroup
 class RegistrationState(StatesGroup):
     full_name = State()
     phone_number = State()
+    registering = State()  # State to handle the registration process
 
 
 class ComplaintState(StatesGroup):

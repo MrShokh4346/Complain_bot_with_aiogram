@@ -22,7 +22,7 @@ async def cmd_start(message: Message, state: FSMContext):
         await message.answer(Texts.get_main_menu_text(), reply_markup=main_menu_keyboard())
         return
     await state.set_state(RegistrationState.full_name)
-    await message.answer("👋 Доброго времени суток, бот создан, чтобы обрабатывать заявки и обращения пользователей. Чтобы воспользоваться этим, пришлите для начала Ваше Имя и Фамилию")
+    await message.answer(Texts.get_registration_text())
 
 
 @router.message(RegistrationState.full_name)

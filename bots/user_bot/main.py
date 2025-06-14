@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from core.config import BOT_TOKEN_USER, REDIS_URL
 from bots.user_bot.users.handlers import call_application, complaints, register, suggestion, settings, application_choise, usefull_contacts, chat
-from bots.user_bot.middlewares import BlockCheckMiddleware
+from bots.user_bot.middlewares import BlockCheckMiddleware, IfRegistratedCheckMiddleware
 from aiogram.fsm.storage.redis import RedisStorage
 from bots.user_bot.admin.handlers import broadcast, user_management, questions
 import redis.asyncio as redis
@@ -20,11 +20,13 @@ async def main():
     # # Use RedisStorage for FSM
     # storage = RedisStorage(redis=redis_client)
 
-    dp = Dispatcher(storage=storage)
+    dp = Dispatcher(storage=MemoryStorage())
     
     dp.include_router(register.router)
 
     # Register and block middlewares
+    dp.message.middleware(IfRegistratedCheckMiddleware())
+
     dp.message.middleware(BlockCheckMiddleware())
 
     # user routers

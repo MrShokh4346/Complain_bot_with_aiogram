@@ -31,7 +31,7 @@ def make_complaint_text(data: dict) -> str:
     user = data.get("user")
     return (
             f"<b>⛔️ Поступила новая жалоба:</b>\n"
-            f"@{user.username or '—'}\n"
+            f"@{user.username or '—'} (id: {user.id})\n"
             f"<b>Имя и Фамилия:</b> {user.full_name or '—'}\n"
             f"<b>Номер телефона:</b> {user.phone_number}\n"
             f"<b>Адрес:</b> {data['address']}\n"

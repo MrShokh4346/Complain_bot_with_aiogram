@@ -82,3 +82,13 @@ async def unblock_user(query: str) -> bool:
             await session.commit()
             return True
         return False
+    
+
+async def delete_user(query: str) -> bool:
+    async with async_session_maker() as session:
+        user = await get_user_by_telegram_id_or_username_with_session(query, session)
+        if user:
+            await session.delete(user)
+            await session.commit()
+            return True
+        return False
