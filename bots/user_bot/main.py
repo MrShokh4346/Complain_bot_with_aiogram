@@ -4,30 +4,34 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from core.config import BOT_TOKEN_USER, REDIS_URL
 from bots.user_bot.users.handlers import call_application, complaints, register, suggestion, settings, application_choise, usefull_contacts, chat
-from bots.user_bot.middlewares import BlockCheckMiddleware, IfRegistratedCheckMiddleware
+from bots.user_bot.middlewares import BlockCheckMiddleware, CheckRegistrationMiddleware
 from aiogram.fsm.storage.redis import RedisStorage
 from bots.user_bot.admin.handlers import broadcast, user_management, questions
-import redis.asyncio as redis
+
+def apply_middlewares(router):
+    router.message.middleware(CheckRegistrationMiddleware())
+    router.message.middleware(BlockCheckMiddleware())
 
 
 async def main():
     bot = Bot(token=BOT_TOKEN_USER)
     storage = RedisStorage.from_url(REDIS_URL)
 
-    # # Create Redis connection
-    # redis_client = redis.Redis(host="localhost", port=6379)
-
-    # # Use RedisStorage for FSM
-    # storage = RedisStorage(redis=redis_client)
-
-    dp = Dispatcher(storage=MemoryStorage())
+    dp = Dispatcher(storage=storage)
     
     dp.include_router(register.router)
 
     # Register and block middlewares
-    dp.message.middleware(IfRegistratedCheckMiddleware())
-
-    dp.message.middleware(BlockCheckMiddleware())
+    for router in [
+        call_application.router,
+        settings.router,
+        usefull_contacts.router,
+        suggestion.router,
+        chat.router,
+        application_choise.router,
+        complaints.router
+    ]:
+        apply_middlewares(router)
 
     # user routers
     dp.include_router(call_application.router)

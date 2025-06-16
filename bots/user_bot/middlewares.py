@@ -5,7 +5,8 @@ from core.config import ADMIN_GROUP_ID
 from db.crud.user_crud import get_user_by_telegram_id_or_username
 from aiogram.fsm.context import FSMContext
 from bots.user_bot.states import RegistrationState
-from typing import Callable, Awaitable, Dict
+from typing import Callable, Awaitable, Dict, Any
+
 
 class BlockCheckMiddleware(BaseMiddleware):
     async def __call__(self, handler, event: TelegramObject, data: dict):
@@ -25,8 +26,7 @@ class BlockCheckMiddleware(BaseMiddleware):
         return await handler(event, data)
     
 
-
-class IfRegistratedCheckMiddleware(BaseMiddleware):
+class CheckRegistrationMiddleware(BaseMiddleware):
     async def __call__(self, handler: Callable, event: Message, data: Dict):
         if isinstance(event, Message):
             user_id = event.from_user.id
@@ -48,7 +48,4 @@ class IfRegistratedCheckMiddleware(BaseMiddleware):
                 await event.answer(Texts.get_registration_text())
                 return
 
-
         return await handler(event, data)
-
-
