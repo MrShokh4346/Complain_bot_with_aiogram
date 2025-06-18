@@ -34,14 +34,14 @@ async def get_full_name(message: Message, state: FSMContext):
         await message.answer("📞 Теперь отправьте Ваш номер телефона через +7 следующим сообщением:")
         return
     # If the full name is not valid, prompt the user to enter it again
-    await message.answer("❗ Пожалуйста, введите корректное Имя и Фамилию (например: Иван Иванов).")
+    await message.answer(Texts.get_name_validation_text(), parse_mode="HTML")
 
 
 @router.message(RegistrationState.phone_number)
 async def get_phone_number(message: Message, state: FSMContext):
     # Validate the phone number input
     if not message.text.startswith("+7") or len(message.text) != 12 or not message.text[2:].isdigit():
-        await message.answer("❗ Пожалуйста, введите корректный номер телефона в формате +7XXXXXXXXXX.")
+        await message.answer(Texts.get_phone_validation_text(), parse_mode="HTML")
         await state.set_state(RegistrationState.phone_number)
         return
     await state.update_data(phone_number=message.text)

@@ -15,7 +15,7 @@ router = Router()
 @router.message(F.text.lower().contains("настройки"))
 async def settings_menu(message: Message, state: FSMContext):
     await state.clear()
-    await message.answer(Texts.get_settings_text(), reply_markup=settings_navigation_buttons())
+    await message.answer(Texts.get_settings_text(), reply_markup=settings_navigation_buttons(), parse_mode="HTML")
 
 
 @router.callback_query(F.data == "settings_change_name")
@@ -30,10 +30,10 @@ async def save_name(message: Message, state: FSMContext):
     user_id = message.from_user.id
     if is_valid_cyrillic_name(message.text):
         await add_or_update_user(user_id, full_name=message.text)
-        await message.answer("🛠✅🛠 Настройки имени успешно применены", reply_markup=main_menu_keyboard())
+        await message.answer("🛠✅🛠 Настройки *имени* успешно применены !", reply_markup=main_menu_keyboard(), parse_mode="Markdown")
         await state.clear()
         return
-    await message.answer("❗ Пожалуйста, введите корректное Имя и Фамилию (например: Иван Иванов).")
+    await message.answer(Texts.get_name_validation_text(), parse_mode="HTML")
 
 
 @router.callback_query(F.data == "settings_change_phone")
@@ -47,10 +47,10 @@ async def ask_phone(callback: CallbackQuery, state: FSMContext):
 async def save_phone(message: Message, state: FSMContext):
     user_id = message.from_user.id
     if not message.text.startswith("+7") or len(message.text) != 12 or not message.text[2:].isdigit():
-        await message.answer("❗ Пожалуйста, введите корректный номер телефона в формате +7XXXXXXXXXX.")
+        await message.answer(Texts.get_phone_validation_text(), parse_mode="HTML")
         return
     user = await add_or_update_user(user_id, phone_number=message.text)
-    await message.answer(f"🛠✅🛠 Настройки номера успешно применены", reply_markup=main_menu_keyboard())
+    await message.answer(f"🛠✅🛠 Настройки *номера* успешно применены", reply_markup=main_menu_keyboard(), parse_mode="Markdown")
     await state.clear()
 
 

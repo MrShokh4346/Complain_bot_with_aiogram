@@ -2,6 +2,7 @@ import asyncio
 from aiogram.filters import Command
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
+from core.redis_client import redis_client
 from core.config import BOT_TOKEN_USER, REDIS_URL
 from bots.user_bot.users.handlers import call_application, complaints, register, suggestion, settings, application_choise, usefull_contacts, chat
 from bots.user_bot.middlewares import BlockCheckMiddleware, CheckRegistrationMiddleware
@@ -15,7 +16,7 @@ def apply_middlewares(router):
 
 async def main():
     bot = Bot(token=BOT_TOKEN_USER)
-    storage = RedisStorage.from_url(REDIS_URL)
+    storage = RedisStorage(redis=redis_client)
 
     dp = Dispatcher(storage=storage)
     

@@ -36,7 +36,6 @@ def make_complaint_text(data: dict) -> str:
             f"<b>Номер телефона:</b> {user.phone_number}\n"
             f"<b>Адрес:</b> {data['address']}\n"
             f"<b>Содержание:</b> {data['body']}\n"
-            # f"🆔 reply_to_user_id:{user.id}"
         )
 
 
@@ -48,7 +47,6 @@ def make_suggestion_text(data: dict) -> str:
             f"<b>Имя и Фамилия:</b> {user.full_name or '—'}\n"
             f"<b>Номер телефона:</b> {user.phone_number}\n"
             f"<b>Содержание:</b> {data['body']}\n"
-            # f"🆔 reply_to_user_id:{user.id}"
         )
 
 
@@ -56,8 +54,17 @@ def make_callback_application(data: dict) -> str:
     user = data.get("user")
     return (
             f"<b>📞 Пользователь просит перезвонить:</b>\n"
-            f"@{user.username or '—'}\n"
+            f"@{user.username or '—'} (id: {user.id})\n"
             f"<b>Имя и Фамилия:</b> {user.full_name or '—'}\n"
             f"<b>Номер телефона:</b> {user.phone_number}\n"
-            # f"🆔 reply_to_user_id:{user.id}"
+        )
+
+
+def make_question_text(data: dict) -> str:
+    user = data.get("user")
+    return (
+            f"<b>💬 Поступила новое сообщение:</b>\n"
+            f"@{user.username or '—'} (id: {user.id})\n"
+            f"<b>Имя и Фамилия:</b> {user.full_name or '—'}\n"
+            f"<b>Содержание:</b> {data['body']}\n"
         )

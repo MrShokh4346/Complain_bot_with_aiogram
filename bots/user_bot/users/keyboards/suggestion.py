@@ -10,3 +10,13 @@ def suggestion_navigation_buttons():
             ]
         ]
     )
+
+
+def end_suggestion_navigation_buttons():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="🔙 Назад", callback_data="suggestion_back")
+            ]
+        ]
+    )

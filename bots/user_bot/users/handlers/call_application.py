@@ -27,7 +27,7 @@ async def ask_confirm_number(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer("Пользователь не найден. Пожалуйста, попробуйте позже.")
         return
     await state.set_state(ContactCallState.confirm)
-    await callback.message.answer(f"Это Ваш верный номер телефона {user.phone_number}?\nЕсли да, нажмите соответствующую кнопку, если нет, впишите свой актуальный номер телефона здесь:", reply_markup=call_request_navigation_buttons())
+    await callback.message.answer(f"*Это Ваш верный номер телефона* {user.phone_number}?\nЕсли да, нажмите соответствующую кнопку, *если нет*, впишите свой актуальный номер телефона здесь:", reply_markup=call_request_navigation_buttons(), parse_mode="Markdown")
 
 
 @router.callback_query(F.data == "call_confirm")
@@ -37,7 +37,7 @@ async def confirm_call(callback: CallbackQuery, state: FSMContext):
     user = await get_user_by_id(user_id)
     data = {'user': user}
     await callback.bot.send_message(COMPLAINT_GROUP_ID, make_callback_application(data), parse_mode="HTML")
-    await callback.message.answer("Отлично! Наш диспетчер перезвонит Вам в ближайшее время.")
+    await callback.message.answer("*Отлично!* Наш диспетчер перезвонит Вам в ближайшее время.", parse_mode="Markdown", reply_markup=main_menu_keyboard())
     await state.clear()
 
 

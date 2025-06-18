@@ -1,10 +1,12 @@
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
+from aiogram.types import ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
 from bots.user_bot.admin.keyboards.questions_keyboards import answer_question_navigation_buttons
 from bots.user_bot.states import AnswerToQuestionState
-from core.config import ADMIN_GROUP_ID
+from core.redis_client import REPLY_MAP_KEY, redis_client
+from core.config import ADMIN_GROUP_ID, COMPLAINT_GROUP_ID
 from db.crud.questions_crud import get_all_questions, save_answer_to_question
 
 router = Router()
@@ -39,38 +41,52 @@ async def confirm_call(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("✏️ Пожалуйста, введите ваш ответ на вопрос.\n❗ Укажите ID вапроса: <code>/questionid_</code>[question_id] ваш ответ", parse_mode="HTML")
 
 
-@router.message(AnswerToQuestionState.waiting_for_answer, F.text.lower().contains("/questionid"))
-async def answer_question(message: Message, state: FSMContext):
+# @router.message(AnswerToQuestionState.waiting_for_answer, F.text.lower().contains("/questionid"))
+# async def answer_question(message: Message, state: FSMContext):
 
-    part = message.text.strip().split()[0]
-    if not part.startswith("/questionid"):
-        await message.answer("❗ Укажите ID вопроса: <code>/questionid_</code>[question_id] ваш ответ", parse_mode="HTML")
-        return
+#     part = message.text.strip().split()[0]
+#     if not part.startswith("/questionid"):
+#         await message.answer("❗ Укажите ID вопроса: <code>/questionid_</code>[question_id] ваш ответ", parse_mode="HTML")
+#         return
     
-    parts = part.split("_")
-    if len(parts) < 2 or not parts[1].isdigit():
-        await message.answer("❗ Укажите корректный ID вопроса: <code>/questionid_</code>[question_id] ваш ответ", parse_mode="HTML")
-        return
+#     parts = part.split("_")
+#     if len(parts) < 2 or not parts[1].isdigit():
+#         await message.answer("❗ Укажите корректный ID вопроса: <code>/questionid_</code>[question_id] ваш ответ", parse_mode="HTML")
+#         return
     
-    entered_question_id = int(parts[1])
+#     entered_question_id = int(parts[1])
     
-    data = await state.get_data()
-    state_question_id = data.get("question_id")
-    if state_question_id != entered_question_id:
-        return
+#     data = await state.get_data()
+#     state_question_id = data.get("question_id")
+#     if state_question_id != entered_question_id:
+#         return
     
-    answer_text = message.text[len(part):].strip()
+#     answer_text = message.text[len(part):].strip()
     
-    question = await save_answer_to_question(state_question_id, answer_text)
+#     question = await save_answer_to_question(state_question_id, answer_text)
     
-    await message.answer("Ваш ответ успешно отправлен!")
+#     await message.answer("Ваш ответ успешно отправлен!")
     
-    # Optionally, you can notify the user who asked the question
-    await message.bot.send_message(
-        question.user_id,
-        f"❓ <b>Ваш вопрос:</b>\n{question.question_text}\n\n✅ <b>Ответ администратора:</b>\n{answer_text}",
-        parse_mode="HTML"
-    )
-    await state.clear()
+#     # Optionally, you can notify the user who asked the question
+#     await message.bot.send_message(
+#         question.user_id,
+#         f"❓ <b>Ваш вопрос:</b>\n{question.question_text}\n\n✅ <b>Ответ администратора:</b>\n{answer_text}",
+#         parse_mode="HTML"
+#     )
+#     await state.clear()
 
 
+@router.message(F.chat.id == COMPLAINT_GROUP_ID, F.reply_to_message)
+async def admin_reply_handler(message: Message):
+    replied_id = message.reply_to_message.message_id
+
+    user_id = await redis_client.hget(REPLY_MAP_KEY, replied_id)
+    if user_id:
+        await message.bot.send_message(
+            int(user_id),
+            f"✅ <b>Ответ администратора:</b>\n{message.text}",
+            reply_markup=ReplyKeyboardRemove(),
+            parse_mode="HTML"
+        )
+    else:
+        await message.answer("❗ Не удалось найти пользователя для ответа на это сообщение. Возможно, оно не было отправлено через чат поддержки.")

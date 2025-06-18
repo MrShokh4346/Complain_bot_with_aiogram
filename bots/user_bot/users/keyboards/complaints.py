@@ -11,6 +11,15 @@ def complaint_navigation_buttons():
         ]
     )
 
+def end_complaint_navigation_buttons():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="🔙 Назад", callback_data="complaint_back")
+            ]
+        ]
+    )
+
 def application_choosing_navigation_buttons():
     return InlineKeyboardMarkup(
         inline_keyboard=[

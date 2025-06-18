@@ -6,7 +6,7 @@ from bots.common.texts import Texts
 from bots.user_bot.users.keyboards.complaints import application_choosing_navigation_buttons, complaint_navigation_buttons
 from bots.user_bot.users.keyboards.main_menu import main_menu_keyboard
 from bots.user_bot.states import  SuggestionState
-from bots.user_bot.users.keyboards.suggestion import suggestion_navigation_buttons
+from bots.user_bot.users.keyboards.suggestion import end_suggestion_navigation_buttons, suggestion_navigation_buttons
 from core.config import COMPLAINT_GROUP_ID
 from core.utils import make_complaint_text, make_suggestion_text
 from db.crud.user_crud import get_user_by_id
@@ -20,13 +20,13 @@ async def handle_suggestion_media_skip(callback: CallbackQuery, state: FSMContex
     await callback.answer()
     await state.update_data(media = None, media_skipped=True)
     await state.set_state(SuggestionState.body)
-    await callback.message.edit_text(Texts.get_suggestion_body_text(), reply_markup=suggestion_navigation_buttons(), parse_mode="HTML")
+    await callback.message.edit_text(Texts.get_suggestion_body_text(), reply_markup=end_suggestion_navigation_buttons(), parse_mode="HTML")
 
 
 @router.callback_query(SuggestionState.media, F.data == "suggestion_back")
 async def handle_suggestion_media_back(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
-    await state.set_state(SuggestionState.media)
+    await state.clear()
     await callback.message.edit_text(Texts.get_application_choosing_text(), reply_markup=application_choosing_navigation_buttons(), parse_mode="HTML")
 
 
@@ -73,12 +73,12 @@ async def get_suggestion_media(message: Message, state: FSMContext):
     await state.update_data(media=message.photo[-1].file_id if message.photo else (message.video.file_id if message.video else None))
     await state.update_data(media_type="photo" if message.photo else ("video" if message.video else None))
     await state.set_state(SuggestionState.body)
-    await message.answer(Texts.get_suggestion_body_text(), reply_markup=suggestion_navigation_buttons(), parse_mode="HTML")
+    await message.answer(Texts.get_suggestion_body_text(), reply_markup=end_suggestion_navigation_buttons(), parse_mode="HTML")
 
 
 @router.message(StateFilter(SuggestionState.media))
 async def handle_suggestion_invalid_input(message: Message):
-    await message.answer("❌ Пожалуйста, отправьте фото или видео. Другие типы сообщений не принимаются на этом этапе.")
+    await message.answer(Texts.get_media_validation_text(), parse_mode="HTML")
 
 
 @router.message(SuggestionState.body)
@@ -100,5 +100,5 @@ async def get_suggestion_body(message: Message, state: FSMContext):
     else:
         await message.bot.send_message(COMPLAINT_GROUP_ID, complaint_text, parse_mode="HTML")
 
-    await message.answer(Texts.get_suggestion_sent_text(), reply_markup=main_menu_keyboard(), parse_mode="HTML")
+    await message.answer(Texts.get_suggestion_sent_text(), reply_markup=main_menu_keyboard(), parse_mode="Markdown")
     await state.clear()
